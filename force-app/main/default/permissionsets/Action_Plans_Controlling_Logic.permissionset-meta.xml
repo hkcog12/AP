@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Action Plans Controlling Logic</label>
+    <description>Read/edit access to the Controlling Logic fields added on Action Plan Task and Action Plan Template Task.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>APTask__c.Controlling_Logic__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>APTemplateTask__c.Controlling_Logic__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+</PermissionSet>

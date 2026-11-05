@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Controlling_Logic__c</fullName>
+    <label>Controlling Logic</label>
+    <description>Logical release condition using task numbers (the number shown in brackets in the Controlling Task list). Examples: 1 OR 2 | 2 AND 3 | (1 OR 2) AND 4. When filled, the task is created only when the condition becomes true. Use either Controlling Task or Controlling Logic, not both.</description>
+    <inlineHelpText>Task numbers combined with AND / OR and brackets, e.g. 1 OR 2, or (1 OR 2) AND 4. The task is created only when the condition is met.</inlineHelpText>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+    <externalId>false</externalId>
+</CustomField>
