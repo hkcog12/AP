@@ -13,9 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 CUSTOM CHANGES (Controlling Logic) - search for CONTROLLING LOGIC:
- 1. generateActionPlans: copy Controlling_Logic__c from the template onto the new plan tasks
- 2. dependency loop: logic tasks get no Controller and no due date yet (same as V4 dependent tasks)
- 3. Task creation loop: no Task is created up-front for logic tasks (released by TaskControllingLogicTrigger)
+ 1. dependency loop: logic tasks get no Controller and no due date yet (same as V4 dependent tasks)
+ 2. Task creation loop: no Task is created up-front for logic tasks (released by TaskControllingLogicTrigger)
+ 3. Template values are copied in ActionPlanCreationController before the creation screen is rendered, so edits are preserved.
 */
 /**
  * Builder Utilities class
@@ -127,11 +127,6 @@ public inherited sharing class ActionPlansBuilderUtilities {
         Map<Id, Id> objectOwnersMap = retrieveOwnersDataRelatedObject(this.relatedRecordIDs);
         //insert Action Plans to DB
         upsert relActionPlans;
-
-        // CONTROLLING LOGIC: copy logic from the template onto the plan tasks (screen order = task numbers)
-        if (this.mode == ApEditMode.MODE_NEW && !relActionPlans.isEmpty()) {
-            ActionPlanControllingLogicService.applyTemplateLogic(this.baseAPTaskList, relActionPlans[0].Action_Plan_Template__c);
-        }
 
         //create ActionPlanTemplatetasks && tasks from base ActionPlan Task List
         if (this.mode == ApEditMode.MODE_NEW) {

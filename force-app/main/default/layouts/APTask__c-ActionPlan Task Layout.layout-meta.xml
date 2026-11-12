@@ -58,6 +58,9 @@
                 <field>Controller__c</field>
             </layoutItems>
             <layoutItems>
+                <field>Controlling_Logic__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>Dependent__c</field>
             </layoutItems>

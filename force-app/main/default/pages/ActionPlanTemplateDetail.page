@@ -122,6 +122,11 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 						value="{!task.TController__r.Subject__c}"
 						rendered="{!TemplateTasks.size > 1}"
 						style="vertical-align: middle" />
+					<apex:column
+						headerValue="{!$ObjectType.APTemplateTask__c.fields.Controlling_Logic__c.label}"
+						value="{!task.Controlling_Logic__c}"
+						rendered="{!TemplateTasks.size > 1}"
+						style="vertical-align: middle" />
 					<apex:column value="{!task.DaysFromStart__c}" style="vertical-align: middle">
 						<apex:facet name="header"
 							>{!$ObjectType.APTemplateTask__c.fields.DaysFromStart__c.label}

@@ -120,6 +120,18 @@ public with sharing class ActionPlanDetailController {
 	}
 
 	/**
+	 * Display the custom Controlling Logic column when any Action Plan task uses it.
+	 */
+	public Boolean gethasControllingLogic() {
+		for (TaskWrapper tw : getActionPlanTasks()) {
+			if (String.isNotBlank(tw.apt.Controlling_Logic__c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Memoized TaskWrappers for display on the page
 	 */
 	private List<TaskWrapper> apTaskWrapperList;
@@ -138,6 +150,7 @@ public with sharing class ActionPlanDetailController {
 						Comments__c,
 						Controller__c,
 						Controller__r.Subject__c,
+						Controlling_Logic__c,
 						DaysFromStart__c,
 						Dependent__c,
 						Id,

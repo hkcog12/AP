@@ -108,13 +108,15 @@ public with sharing class ActionPlanControllingLogicService {
     }
 
     // =====================================================================
-    // 3. COPY - template logic onto the plan tasks (called from ActionPlansBuilderUtilities)
+    // 3. COPY - legacy utility retained for compatibility/tests. The creation controller and
+    // Flow invocable now copy this field before task insertion, so builder save does not
+    // overwrite user edits made on the Action Plan creation screen.
     // =====================================================================
 
     /**
-     * Fills Controlling_Logic__c on the plan tasks (in screen order) from the template.
-     * Matches by position when the task count is unchanged, otherwise by unique Subject.
-     * Values already set on the plan task are kept. Tasks with a Controlling Task are skipped.
+     * Legacy helper to fill Controlling_Logic__c on plan tasks from a template.
+     * The current Visualforce and Flow creation routes copy the field before save; this
+     * method remains available for compatibility with existing callers.
      */
     public static void applyTemplateLogic(List<APTask__c> planTasksInOrder, Id templateId) {
         if (templateId == null || planTasksInOrder == null || planTasksInOrder.isEmpty()) {

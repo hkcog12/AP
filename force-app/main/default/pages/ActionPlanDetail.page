@@ -158,6 +158,12 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 						style="vertical-align: middle">
 						<apex:outputField value="{!wrap.apt.Controller__r.Subject__c}" />
 					</apex:column>
+					<apex:column
+						headerValue="{!$ObjectType.APTask__c.fields.Controlling_Logic__c.label}"
+						rendered="{!ActionPlanTasks.Size > 1 && hasControllingLogic}"
+						style="vertical-align: middle">
+						<apex:outputField value="{!wrap.apt.Controlling_Logic__c}" />
+					</apex:column>
 					<apex:column value="{!wrap.apt.DaysFromStart__c}" style="vertical-align: middle" id="daysColumn">
 						<apex:facet name="header">
 							{!$ObjectType.APTask__c.fields.DaysFromStart__c.label}&nbsp;
