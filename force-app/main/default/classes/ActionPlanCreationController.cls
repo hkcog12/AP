@@ -838,6 +838,32 @@ public with sharing class ActionPlanCreationController {
 				}
 			}
 
+			// CONTROLLING LOGIC: expressions use 1-based row numbers, so renumber after removal.
+			Integer removedNumber = taskIndex + 1;
+			List<String> clearedRows = new List<String>();
+			for (Integer i = 0; i < this.apTasks.size(); i++) {
+				if (i == taskIndex) {
+					continue;
+				}
+				APTask__c logicTask = this.apTasks[i];
+				if (String.isBlank(logicTask.Controlling_Logic__c)) {
+					continue;
+				}
+				String renumbered = ActionPlanControllingLogic.renumberAfterRemoval(logicTask.Controlling_Logic__c, removedNumber);
+				if (renumbered == null) {
+					clearedRows.add(logicTask.Subject__c + ' (' + logicTask.Controlling_Logic__c + ')');
+					logicTask.Controlling_Logic__c = null;
+				} else {
+					logicTask.Controlling_Logic__c = renumbered;
+				}
+			}
+			if (!clearedRows.isEmpty()) {
+				ApexPages.addMessage(new ApexPages.Message(
+					ApexPages.Severity.WARNING,
+					'Controlling Logic was cleared on: ' + String.join(clearedRows, ', ') + ' because it referred to the removed task. Please re-enter it.'
+				));
+			}
+
 			// before remove, check if it exists in the DB. If so, add to pendingDeletes to be deleted on save.
 			if (this.apTasks[taskIndex].Id != null) {
 				if (pendingDeletes == null) {
@@ -899,6 +925,7 @@ public with sharing class ActionPlanCreationController {
 						CreatedById,
 						Action_Plan_Template__c,
 						TController__r.Subject__c,
+						Controlling_Logic__c,
 						Reminder__c,
 						Minutes_Reminder__c,
 						SendEmail__c,
@@ -922,6 +949,9 @@ public with sharing class ActionPlanCreationController {
 					apt.Subject__c = aptTask.Subject__c;
 					apt.Priority__c = aptTask.Priority__c;
 					apt.Dependent__c = aptTask.Dependent__c;
+					// CONTROLLING LOGIC: copy the template's expression onto the plan row
+					// before rendering the Action Plan creation screen, so users can review/edit it.
+					apt.Controlling_Logic__c = aptTask.Controlling_Logic__c;
 					apt.TaskIndex__c = aptTask.TaskIndex__c;
 					apt.DaysFromStart__c = aptTask.DaysFromStart__c;
 					apt.Reminder__c = aptTask.Reminder__c;
@@ -988,6 +1018,7 @@ public with sharing class ActionPlanCreationController {
 				Controller__r.Name,
 				Controller__r.Subject__c,
 				Controller__c,
+				Controlling_Logic__c,
 				Action_Plan__c,
 				Reminder__c,
 				SendEmail__c,
@@ -1206,7 +1237,56 @@ public with sharing class ActionPlanCreationController {
 			}
 			index++;
 		}
+		if (this.planLogicInvalid()) {
+			return true;
+		}
 		return exists;
+	}
+
+	/**
+	 * CONTROLLING LOGIC: validate expressions on the Action Plan creation/edit screen.
+	 * The expression task numbers are 1-based screen positions, while Dependent__c is 0-based.
+	 */
+	@TestVisible
+	private Boolean planLogicInvalid() {
+		Set<Integer> positions = new Set<Integer>();
+		for (Integer i = 0; i < this.apTasks.size(); i++) {
+			positions.add(i + 1);
+		}
+		Map<Integer, Set<Integer>> graph = new Map<Integer, Set<Integer>>();
+		String error;
+		for (Integer i = 0; i < this.apTasks.size() && error == null; i++) {
+			APTask__c t = this.apTasks[i];
+			Integer pos = i + 1;
+			Set<Integer> deps = new Set<Integer>();
+			Boolean hasController = t.Dependent__c != null && t.Dependent__c != 'None';
+			if (hasController) {
+				deps.add(Integer.valueOf(t.Dependent__c) + 1);
+			}
+			if (String.isNotBlank(t.Controlling_Logic__c)) {
+				t.Controlling_Logic__c = t.Controlling_Logic__c.normalizeSpace();
+				if (hasController) {
+					error = 'Task ' + pos + ' (' + t.Subject__c + '): ' + ActionPlanControllingLogicService.BOTH_SET_ERROR;
+					break;
+				}
+				String err = ActionPlanControllingLogic.validate(t.Controlling_Logic__c, pos, positions);
+				if (err != null) {
+					error = 'Task ' + pos + ' (' + t.Subject__c + '): ' + err;
+					break;
+				}
+				deps.addAll(ActionPlanControllingLogic.getReferencedTasks(t.Controlling_Logic__c));
+			}
+			graph.put(pos, deps);
+		}
+		if (error == null && ActionPlanControllingLogic.hasCycle(graph)) {
+			error = ActionPlanControllingLogicService.CYCLE_ERROR;
+		}
+		if (error != null) {
+			this.errorMsg = error;
+			ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, error));
+			return true;
+		}
+		return false;
 	}
 
 	/**

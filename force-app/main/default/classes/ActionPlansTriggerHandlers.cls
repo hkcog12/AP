@@ -274,7 +274,7 @@ global inherited sharing class ActionPlansTriggerHandlers {
 					a.DaysFromStart__c = a.DaysFromStart__c == null ? 0 : a.DaysFromStart__c;
 					a.Dependent__c = (String.isBlank(a.Dependent__c)) ? 'None' : a.Dependent__c;
 					// support manually creating related tasks - for future moving all logic into trigger handlers
-					if(a.Id == null && a.Controller__c == null && a.DaysFromStart__c != null && a.ActivityDate__c == null){
+					if (a.Id == null && a.Controller__c == null && a.Dependent__c == 'None' && String.isBlank(a.Controlling_Logic__c) && a.DaysFromStart__c != null && a.ActivityDate__c == null) {
 						a.ActivityDate__c = parentMap.get(a.Action_Plan__c).StartDate__c.addDays(a.DaysFromStart__c.intValue());
 					}
 				}

@@ -185,6 +185,7 @@
         <excludeButtons>New</excludeButtons>
         <fields>NAME</fields>
         <fields>Controller__c</fields>
+        <fields>Controlling_Logic__c</fields>
         <fields>Status__c</fields>
         <fields>User__c</fields>
         <fields>ActivityDate__c</fields>

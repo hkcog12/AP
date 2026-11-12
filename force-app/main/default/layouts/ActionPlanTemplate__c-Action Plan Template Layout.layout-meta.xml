@@ -116,6 +116,7 @@
         <excludeButtons>New</excludeButtons>
         <fields>NAME</fields>
         <fields>TController__c</fields>
+        <fields>Controlling_Logic__c</fields>
         <fields>User__c</fields>
         <fields>DaysFromStart__c</fields>
         <fields>TaskIndex__c</fields>

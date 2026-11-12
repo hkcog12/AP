@@ -114,6 +114,7 @@ public with sharing class ActionPlanTemplateDetailController {
 				Action_Plan_Template__c,
 				TController__c,
 				TController__r.Subject__c,
+				Controlling_Logic__c,
 				Reminder__c,
 				SendEmail__c,
 				Comments__c

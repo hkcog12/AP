@@ -84,6 +84,7 @@ global inherited sharing class ActionPlanCreateInvocable {
 						DaysFromStart__c,
 						Action_Plan_Template__c,
 						TController__r.Subject__c,
+						Controlling_Logic__c,
 						Minutes_Reminder__c,
 						Reminder__c,
 						SendEmail__c,
@@ -181,6 +182,8 @@ global inherited sharing class ActionPlanCreateInvocable {
 					apTask.Subject__c = aptTask.Subject__c;
 					apTask.Priority__c = aptTask.Priority__c;
 					apTask.Dependent__c = aptTask.Dependent__c;
+					// CONTROLLING LOGIC: preserve the template expression on the Action Plan task.
+					apTask.Controlling_Logic__c = aptTask.Controlling_Logic__c;
 					apTask.TaskIndex__c = aptTask.TaskIndex__c;
 					apTask.DaysFromStart__c = aptTask.DaysFromStart__c;
 					apTask.Comments__c = aptTask.Comments__c;
@@ -193,6 +196,11 @@ global inherited sharing class ActionPlanCreateInvocable {
 					apTask.Status__c = ActionPlansUtilities.getTaskRecordTypeStatusDefaultValues().get(ActionPlansUtilities.getDefaultTaskRecordTypeId());
 
 					if (apTask.Dependent__c != null && apTask.Dependent__c != 'None') {
+						apTask.ActivityDate__c = null;
+					} else if (String.isNotBlank(apTask.Controlling_Logic__c)) {
+						// This task is released by the Controlling Logic evaluator after its expression is true.
+						apTask.Controller__c = null;
+						apTask.Dependent__c = 'None';
 						apTask.ActivityDate__c = null;
 					} else {
 						apTask.Controller__c = null;
@@ -302,12 +310,17 @@ global inherited sharing class ActionPlanCreateInvocable {
 			Database.DMLOptions dmlNoEmail = new Database.DMLOptions();
 			dmlEmail.EmailHeader.TriggerUserEmail = false;
 
-			if (apTask.SendEmail__c == true) {
-				t.setOptions(dmlEmail);
-				allTasksToInsert.add(t);
-			} else {
-				t.setOptions(dmlNoEmail);
-				allTasksToInsert.add(t);
+			// Only root tasks are created immediately. V4 releases classic dependent tasks
+			// when their Controller task closes; Controlling Logic tasks are released by
+			// ActionPlanControllingLogicService.releaseOnTaskClose().
+			if ((String.isBlank(apTask.Dependent__c) || apTask.Dependent__c == 'None') && String.isBlank(apTask.Controlling_Logic__c)) {
+				if (apTask.SendEmail__c == true) {
+					t.setOptions(dmlEmail);
+					allTasksToInsert.add(t);
+				} else {
+					t.setOptions(dmlNoEmail);
+					allTasksToInsert.add(t);
+				}
 			}
 		}
 

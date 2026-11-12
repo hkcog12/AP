@@ -81,6 +81,11 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 				input.errorBorder {
 					border: 2px solid #cc0000;
 				}
+				/* CONTROLLING LOGIC */
+				input.controllingLogicInput {
+					width: 120px;
+					text-transform: uppercase;
+				}
 			</style>
 			<apex:variable value="{!$User.UIThemeDisplayed == 'Theme4d' || $User.UIThemeDisplayed == 'Theme4u'}" var="lex" />
 			<apex:slds rendered="{!lex}" />
@@ -436,6 +441,24 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 										<apex:selectOptions value="{!SubjectItems}" />
 									</apex:selectList>
 									<apex:inputHidden value="{!wrapTask.apt.TaskIndex__c}" id="theHiddenInput" />
+								</apex:column>
+
+								<!-- CONTROLLING LOGIC: copied from the selected template and editable before save -->
+								<apex:column rendered="{!Tasks.Size > 1}" style="padding-right: 10px">
+									<apex:facet name="header">
+										<span>
+											{!$ObjectType.APTask__c.fields.Controlling_Logic__c.label}
+											<img class="helpOrb" title="{!$ObjectType.APTask__c.fields.Controlling_Logic__c.inlineHelpText}" src="/s.gif" style="vertical-align: top" />
+										</span>
+									</apex:facet>
+									<apex:inputText
+										id="controllingLogic"
+										value="{!wrapTask.apt.Controlling_Logic__c}"
+										maxlength="255"
+										styleClass="controllingLogicInput slds-input"
+										html-placeholder="e.g. 1 OR 2"
+										rendered="{!!wrapTask.apt.IsClosed__c}" />
+									<apex:outputField value="{!wrapTask.apt.Controlling_Logic__c}" rendered="{!wrapTask.apt.IsClosed__c}" />
 								</apex:column>
 
 								<!--  Task Days After  -->

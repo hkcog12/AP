@@ -44,6 +44,9 @@
 				<behavior>Readonly</behavior>
 				<field>TController__c</field>
 			</layoutItems>
+			<layoutItems>
+				<field>Controlling_Logic__c</field>
+			</layoutItems>
 		</layoutColumns>
 		<style>TwoColumnsTopToBottom</style>
 	</layoutSections>
